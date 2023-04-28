@@ -1,7 +1,27 @@
-# Yolo v8 Aim Assist
-## If you like it, a star is appreciated!!!
+# Yolov8 Aim Assist with IFF
+## Disclaimer 
+- This is a modified branch of project: [Franklin-Zhang0/Yolo-v8-Apex-Aim-assist](https://github.com/Franklin-Zhang0/Yolo-v8-Apex-Aim-assist). Kudos to Franklin! If you find this project useful, please consider starring the original repo!
+- This project has no intend of being utilized in game play and it should not be. Use at your own risk.
+- This project will not be regularly maintained as it already meets the goal(for now). Update might be provided once better models/compression methods/quantization methods are available.
 
-## 1. How to set up the environment
+## Performance Benchmarks
+
+## Advantages and Todos
+Advantages:
+* [x] Fast screencapturing with dxshot
+* [x] Not Logitech Macro/GHub dependent
+* [x] Customizable trigger keys
+* [x] PID capable
+* [x] IFF(Identification friend or foe) capable (very brocken)
+* [x] fp16 precision
+
+Todos:
+* [ ] int8 precision
+* [ ] Pruning
+* [ ] Increase accuracy of IFF
+* [ ] Increase accuracy under: ADS, partial body exposure, gunfire blockage, smoke...
+
+## 1. Set up the environment
 
 ### 1.1. Environment set up under Linux
 - Install `Conda` (if not already installed)
@@ -58,12 +78,12 @@ The following method has being tested and successed under `Windows 10 Pro Versio
     ```
 
 - Install `cuDNN`.
-    - Register for the [`NVIDIA developer program`](https://developer.nvidia.com/login)
-    - Go to the cuDNN download site:[`cuDNN download archive`](https://developer.nvidia.com/rdp/cudnn-archive)
-    - Click `Download cuDNN v8.5.0 (August 8th, 2022), for CUDA 11.x`
-    - Download `Local Installer for Windows (Zip)`
-    - Unzip `cudnn-windows-x86_64-8.5.0.96_cuda11-archive.zip`
-    - Copy all three folders (`bin`,`include`,`lib`) and paste them to the `CUDA` installation directory `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7`. (NOTE `bin`,`include`,`lib` folders are already exist in the CUDA folder.)
+    - Register for the [`NVIDIA developer program`](https://developer.nvidia.com/login).
+    - Go to the cuDNN download site:[`cuDNN download archive`](https://developer.nvidia.com/rdp/cudnn-archive).
+    - Click `Download cuDNN v8.5.0 (August 8th, 2022), for CUDA 11.x`.
+    - Download `Local Installer for Windows (Zip)`.
+    - Unzip `cudnn-windows-x86_64-8.5.0.96_cuda11-archive.zip`.
+    - Copy all three folders (`bin`,`include`,`lib`) and paste them to the `CUDA` installation directory `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7`. (NOTE `bin`,`include`,`lib` folders are already exist in the CUDA folder.).
 
 - Install `PyTorch`.
     ```shell
@@ -81,6 +101,10 @@ The following method has being tested and successed under `Windows 10 Pro Versio
         conda activate yolov8 # activate dedicated environment
         pip install tensorrt-8.5.2.2-cp310-none-win_amd64.whl # install tensorrt package to python
         ```
+ - Install python requirement.
+   ``` shell
+   pip install -r requirement.txt
+   ```
 
 <details>
 <summary> Verify installation and check versions.</summary>
@@ -134,37 +158,128 @@ The following method has being tested and successed under `Windows 10 Pro Versio
 </details>
 
 
-### Using TensorRT to accelerate (Optional)
 
-If you can't install tensorrt in this way, you can look up this [Nvidia guide](https://docs.nvidia.com/deeplearning/tensorrt/archives/tensorrt-601/tensorrt-install-guide/index.html#installing-zip)
+## 2. Build your weight
+### 2.1. PyTorch `.pt` weight
+You have several options here to realize your `.pt` weight:
+- (1) Use the provided weight `apex_v8n.pt`.
+     
+     This is a weight based on `yolov8n.pt`, trained with 7W screenshots and labeled 'Enemy', 'Teammate'. Due to the nature of this project, the provided weight is poorly trained to prevent abuse and cheating. However, it can already track characters well and demonstrate some level of IFF capability.  
+     
+- (2) Use the provided weight `apex_v8n.pt` as a pretrained weight and train your own weight with your own dataset.
+     
+     Please follow the [official instruction](https://docs.ultralytics.com/usage/cli/) of `Ultralytics` to train your own weight.
+     
+     Note that the dataset is required to use `YOLO` annotation format, please reform your dataset into the following structure:
+        
+    ```shell
+    dataset/apex/
+    ├── train
+    |   ├── images
+    │   |   ├── 000000000001.jpg
+    │   |   ├── 000000580008.jpg
+    │   |   |   ...
+    |   ├── lables    
+    │   |   ├── 000000000001.txt
+    │   |   ├── 000000580008.txt
+    │   |   |   ...
+    ├── valid
+    |   ├── images
+    │   |   ├── 000000000113.jpg
+    │   |   ├── 000000000567.jpg
+    |   ├── lables    
+    │   |   ├── 000000000113.txt
+    │   |   ├── 000000000567.txt
+    │   |   |   ...    
+    ```
+    
+- (3) Train your own weight with official pretrained `yolov8` weights.
+    
+    If the provided weight which is based on `yolov8n.pt` can not meet your expectation. You can also explore the options of other pretrained weights provided by `yolov8`.
+    
+    - Model speed: `8n>8s>8m`
+    
+    - Model accuracy: `8n<8s<8m`
+    
+    Please follow the [official instruction](https://docs.ultralytics.com/usage/cli/) of `Ultralytics` to train your own weight.
+    
+### 2.2. ONNX `.onnx` weight (skip if only fp16 precision is desired)
 
+You have several options here to to convert your `.pt` weight to a `.onnx` weight.
 
-I have provided '.trt' models, but there's a high probability that you have to transform the '.pt' model to '.trt' model by yourself, because the Tensorrt engines are environment specific. This repo may helpful: [TensorRT-For-YOLO-Series](https://github.com/Linaom1214/TensorRT-For-YOLO-Series)
+- (1) Use yolov8 built in function `YOLO export`:
 
+    ```shell
+    yolo export model=<your weight path>/best.pt format=onnx
+    ```
+    Note this built-in method is identical to the python code provided in [TensorRT-For-YOLO-Series](https://github.com/Linaom1214/TensorRT-For-YOLO-Series)
+    
+- (2) Use Paddleslim ACT (In Linux):
+    
+    
 
-## 2. How to run the program
-just run the `main.py` file with the following command
+### 2.3. TensorRT `.trt` or `.engine` weight
 
-`python main.py`
+Use any of the following methods to generate TensorRT engine:
 
-After a few seconds, the program will start to run. You can see `Main Start` in the console.
+- (1) Use yolov8 built-in function `YOLO export` to export `.engine` weight directly from `.pt` weight.
+    
+    ```shell
+    # out put fp32 precision (default)
+    yolo export model=<your weight path>/best.pt format=engine
+    
+    # out put fp16 precision (recommanded)
+    yolo export model=<your weight path>/best.pt format=engine fp16=True
+    ```
+- (2) Use the third-party method [TensorRT-For-YOLO-Series](https://github.com/Linaom1214/TensorRT-For-YOLO-Series) to export `.trt` weight from previous generated `.onnx` weight.
 
-Once you hold the right mouse button or the left mouse button (no matter you hold to aim or start shooting), the program will start to aim at the enemy.
+    ```shell
+    # out put fp32 precision
+    python export.py -o <your weight path>/best.onnx -e apex_fp32.trt -p fp32 -end2end --v8
+    
+    # out put fp16 precision (default, recommanded)
+    python export.py -o <your weight path>/best.onnx -e apex_fp16.trt -end2end --v8
+    
+    # out put int8 precision (for extreme performance)
+    python export.py -o <your weight path>/best.onnx -e apex_int8.trt -p int8 --calib_input <your data path>/train/images --calib_num_images 500 --end2end --v8
+    ```
+    
+## 3. Run the program
+Replace the model and change settings in the `args_.py` file (See Section 4.)
 
-## 3. How to change the settings
-You can change the settings in the `args.py` file.
+Run the `main.py` file with the following command
+```shell        
+conda activate v8trt # activate dedeicated env
+python main.py # start aim assist
+```
+After a few seconds, the program will start fucntioning. You should see the follwing prompts in the console:
+```shell
+listener start
+Main start
+Screenshot fps:  311.25682541048934
+fps:  61.09998811302416
+interval:  0.016366615295410156
+```
 
-### Some important settings!!!:
-- model
-    - The default model is for Apex. However, you can train your own model using `train.py`, and switch the model using this setting.
-    - There're several model in the "model" dir, you can choose one of them.
-        - The `.trt` models are for tensorRT, which is about 4 times faster than the `.pt` models, but with the same accuracy. 
-        - Model speed: `8n>8s>8m`
-        - Model accuracy: `8n<8s<8m`
-- crop_size
-    - This setting determines the portion of the screen to be detected. Too high may cause difficulty in detecting little objects.
-## Note
-This program is only for educational purposes. I am not responsible for any damage caused by this program.
+Explaination of keys:
+- `Shift`: Holding shift triggers aim assist. By default, only `holding shift` can trigger the aim assist.
+- `Left`: Unlock `left mouse button`. Once `left` key is clicked, you should hear a beep and now holding `left mouse button` can also trigger aim assist 
+- `Right`: Unlock `right mouse button`. Once `right` key is clicked, you should hear a beep and now holding `right mouse button` can also trigger aim assist 
+- `End`: Cilck `End` for continious aiming. Auto aiming is always on and another click to turn off.
+- `Left mouse button`: Optional trigger
+- `Right mouse button`: Optional trigger
+- `Home`: Stop listening and exit program
+
+## 4. Change settings
+You can change following settings in the `args_.py` file.
+- `--model`: The weight to be used by this project. Please replace this with your own `.trt` or `.engine` weight.
+- `--classes`: Classes to be detected, 0 represents 'Enemy', 1 represents 'Teammate'. Change default to [0, 1] if both targets are wanted.
+- `--conf`: Confidence level for inference. Adjust it based on your model accuracy.
+- `--crop_size`: The portion to detect from the screen. Adjust it based on your monitor resolution. For example: `1/3` for 1440P, or `1/2` for 1080P.
+- `--pid`: Use PID controller to smooth aiming and prevent overdrifting. Leave it by default is recommanded.
+- `--Kp`,`--Ki`,`--Kd`: PID components that need to be carefully calibrated. `--Kp=0.5`, `--Ki=0.1`, `--Kd=0.1` is recommanded as starting point.
+You can also modify the `MyListener.py` file.
+- Function `def listen_key(key)` and def `keys_released(key)`: Change `keyboard.Key.home`, `keyboard.Key.end`, `keyboard.Key.shift`, `keyboard.Key.left` or `keyboard.Key.right` to whatever keys you like to customize the key settings.
 
 ## Reference
 [Train image dataset](https://universe.roboflow.com/apex-esoic/apexyolov6)
