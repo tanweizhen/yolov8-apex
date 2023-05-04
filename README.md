@@ -235,10 +235,10 @@ Use any of the following methods to generate TensorRT engine:
 
     ```shell
     # out put fp32 precision
-    python export.py -o <your weight path>/best.onnx -e apex_fp32.trt -p fp32 -end2end --v8
+    python export.py -o <your weight path>/best.onnx -e apex_fp32.trt -p fp32 --end2end --v8
     
     # out put fp16 precision (default, recommanded)
-    python export.py -o <your weight path>/best.onnx -e apex_fp16.trt -end2end --v8
+    python export.py -o <your weight path>/best.onnx -e apex_fp16.trt --end2end --v8
     
     # out put int8 precision (for extreme performance)
     python export.py -o <your weight path>/best.onnx -e apex_int8.trt -p int8 --calib_input <your data path>/train/images --calib_num_images 500 --end2end --v8
