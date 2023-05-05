@@ -32,7 +32,7 @@ Advantages:
 * [x] Not Logitech Macro/GHub dependent
 * [x] Customizable trigger keys
 * [x] PID capable
-* [x] IFF(Identification friend or foe) capable (very brocken)
+* [x] IFF(Identification friend or foe) capable (Works 50/50)
 * [x] fp16 precision
 
 Todos:
