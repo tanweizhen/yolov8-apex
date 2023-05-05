@@ -5,6 +5,26 @@
 - This project will not be regularly maintained as it already meets the goal(for now). Update might be provided once better models/compression methods/quantization methods are available.
 
 ## Performance Benchmarks
+<details>
+<summary>Test setting:</summary> 
+    
+    - OS: Windows 11 Pro 22H2
+    - CPU: AMD Ryzen 3900X
+    - GPU: NVIDIA GeForce RTX 2080 8G
+    - RAM: 32G @ 3600MHz
+    - Monitor resolution: 2560 x 1440
+    - In-game resolution: 2560 x 1440
+    - In-game FPS: Locked @ 60fps
+    
+</details>
+
+| Model        | Size<br><sup>(pixels) | Enemy prediction<sup>val<br>mAP 50-95 | Teammate prediction<sup>val<br>mAP 50-95 | Speed<br><sup>.trt fp16<br>(fps) | Speed<br><sup>.trt int8<br>(fps) | IFF performence |
+| -------------| --------------------- | -------------------- | -------------------- | ------------------------------ | ------------------------------- | ------------------ |
+| Apex_8n      | 640                   | 54.5                 | 71.3                 | 58.88                          | 61.23                           | Poor                |
+| Apex_8s      | 640                   | 66.9                 | 79.2                 | 27.10                          | 33.43                           | Acceptable               |
+| Apex_8n_pruned| 640                  | 44.1                 | 55.9                 | 72.22                          | 74.04                           | Poor               |
+| Apex_8s_pruned| 640                  | 52.9                 | 64.9                 | 30.54                          | 31.82                           | Poor               |
+
 
 ## Advantages and Todos
 Advantages:
@@ -16,8 +36,8 @@ Advantages:
 * [x] fp16 precision
 
 Todos:
-* [ ] int8 precision
-* [ ] Pruning
+* [x] int8 precision (No significant improvement as for now)
+* [x] Pruning (Sacrificies accuracy way too much)
 * [ ] Increase accuracy of IFF
 * [ ] Increase accuracy under: ADS, partial body exposure, gunfire blockage, smoke...
 
