@@ -293,7 +293,7 @@ Explaination of keys:
 ## 4. Change settings
 You can change following settings in the `args_.py` file.
 - `--model`: The weight to be used by this project. Please replace this with your own `.trt` or `.engine` weight.
-- `--classes`: Classes to be detected, 0 represents 'Enemy', 1 represents 'Teammate'. Change default to [0, 1] if both targets are wanted.
+- `--classes`: classes to be detected, can be expanded but need to be an array. For example, 0 represents 'Teammate', 1 represents 'Enemy'. Then the input should be [1].
 - `--conf`: Confidence level for inference. Adjust it based on your model accuracy.
 - `--crop_size`: The portion to detect from the screen. Adjust it based on your monitor resolution. For example: `1/3` for 1440P, or `1/2` for 1080P.
 - `--pid`: Use PID controller to smooth aiming and prevent overdrifting. Leave it by default is recommanded.
