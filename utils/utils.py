@@ -101,7 +101,7 @@ class BaseEngine(object):
         cap.release()
         cv2.destroyAllWindows()
 
-    def inference(self, img, conf=0.5, end2end=False):
+    def inference(self, img, conf=0.5, classes=[], end2end=False):
         origin_img = img
         img, ratio = preproc(origin_img, self.imgsz, self.mean, self.std)
         data = self.infer(img)
@@ -116,9 +116,15 @@ class BaseEngine(object):
         if dets is not None:
             final_boxes, final_scores, final_cls_inds = dets[:,
                                                              :4], dets[:, 4], dets[:, 5]
-            boxes = final_boxes[final_scores > conf]
-            # origin_img = vis(origin_img, final_boxes, final_scores, final_cls_inds,
-            #                  conf=conf, class_names=self.class_names)
+            scores_mask = final_scores > conf
+            if len(classes) > 0:
+                class_mask = np.isin(final_cls_inds, classes)
+                mask = np.logical_and(scores_mask, class_mask)
+            else:
+                mask = scores_mask
+            boxes = final_boxes[mask]
+        else:
+            boxes = np.empty((0,4))
         return boxes
 
     @staticmethod
