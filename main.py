@@ -24,7 +24,7 @@ def listeners():
 
 
 count = 0
-interval = 0.02
+interval = 0.01
 if __name__ == "__main__":
     # create a arg set
     Listen = True
@@ -41,14 +41,9 @@ if __name__ == "__main__":
     # Mouse_mover = Thread(target=Move_Mouse, args=(args,), name="Mouse_mover")
     # Mouse_mover.start()
     shot_init(args)
-    if args.model[-3:] == ".pt":
-        from predict import *
+    from predict import *
 
-        predict_init(args)
-    else:
-        from trt import predict_trt, predict_init
-
-        predict_init(args)
+    predict_init(args)
     print("Main start")
     time_start = time.time()
     time_captured_total = 0
@@ -63,12 +58,9 @@ if __name__ == "__main__":
         # print("shots time: ", time.time() - time_shot)
         # predict the image
         time.sleep(args.wait)
-        if args.model[-3:] == ".pt":
-            predict_res = predict(args, img)
-            boxes = predict_res.boxes
-            boxes = boxes[boxes[:].cls == args.target_index].cpu().xyxy.numpy()
-        else:
-            boxes = predict_trt(args, img)
+        predict_res = predict(args, img)
+        boxes = predict_res.boxes
+        boxes = boxes[boxes[:].cls == args.target_index].cpu().xyxy.numpy()
         time_predict = time.time()
         # print("predict time: ", time.time() - time_captured)
         if Start_detection:
