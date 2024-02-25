@@ -11,7 +11,7 @@ def arg_init(args):
         "--model_dir", type=str, default=dirpath + "/model", help="model dir"
     )
     args.add_argument("--model", type=str,
-                      default="/apex_8s.pt", help="model path")
+                      default="/best.engine", help="model path")
     args.add_argument("--iou", type=float,
                       default=0.8, help="predict iou")
     args.add_argument("--classes",
