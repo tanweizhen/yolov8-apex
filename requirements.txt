@@ -8,3 +8,5 @@ pyautogui
 pynput
 pywin32
 opencv-python
+comtypes
+pycuda==2023.1
