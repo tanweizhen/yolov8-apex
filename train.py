@@ -5,8 +5,8 @@ import argparse
 
 def train(args):
     data_path = "/dataset/firstset/data.yaml"
-    model = YOLO("Model/apex_8s.pt")
-    model.train(data=args.dir + data_path, epochs=10, batch=20, workers=8, val=False)
+    model = YOLO("runs/detect/train/best.pt")
+    model.train(data=args.dir + data_path, epochs=100, batch=20, workers=8, val=True)
     #model = YOLO(args.dir+"/model/apex_total_8n_350_1000.pt")
     model.val(data=args.dir + data_path)
 
