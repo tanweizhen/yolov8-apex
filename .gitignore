@@ -1,0 +1,10 @@
+#datasets
+/dataset/*
+/dataset/*/*
+/dataset/*/*/*
+__pycache__/*
+utils/__pycache__/*
+runs/*
+runs/*/*
+runs/*/*/*
+Model/*

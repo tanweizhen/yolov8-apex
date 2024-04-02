@@ -43,6 +43,13 @@ Todos:
 
 ## 1. Set up the environment
 
+- Version-align
+
+    |  CUDA   |  cuDNN   | TensorRT | PyTorch  |
+    | :-----: | :------: | :------: | :------: |
+    | 12.1.1  | 8.9.0    |  8.6.1.1 | 2.2.1    |
+
+
 ### 1.1. Environment set up under Linux
 - Install `Conda` (if not already installed)
 
@@ -81,49 +88,46 @@ Todos:
 
 ### 1.2. Environment set up in Windows10 & Windows11
 
-The following method has being tested and successed under `Windows 10 Pro Version 21H2/22H2`, `Windows11 Pro Version 22H2` and `Windows11 Pro Insider View Build 25346`. Technically, it works under all latest `Windows OS` builds.
-- Version-align
-
-    |  CUDA   |  cuDNN   | TensorRT | PyTorch  |
-    | :-----: | :------: | :------: | :------: |
-    | 11.7.0  | 8.5.0    |  8.5.2.2 | 2.0.0    |
-    | 11.8.0  | 8.6.0    |  8.5.3.1 | 2.0.0    |
-    | ...    | ...   |  ... | ...    |
-    
-    We will be using the first row as our package manifests.
-    
-- Install `CUDA`. (One can also follow the official instruction:[`CUDA official website`](https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html)).
+- In your terminal window, run:
     ```shell
-    conda install cuda -c nvidia/label/cuda-11.7.0 # install CUDA 11.7.0
+    conda create -n yolov8 python=3.10 # create environment 'yolov8' with python 3.10 installed 
+    conda activate yolov8 # activate environment 'yolov8'
+    ```
+
+- Install `CUDA`. (One can also follow the official instruction:[`CUDA official website`](https://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html)).
+DOWNLOAD NVIDIA CUDA COMPUTING TOOLKIT 12.1.1 AND RUN THE BELOW COMMAND
+    ```shell
+    conda install cuda -c nvidia/label/cuda-12.1.1 # install CUDA 12.1.1
     ```
 
 - Install `cuDNN`.
     - Register for the [`NVIDIA developer program`](https://developer.nvidia.com/login).
     - Go to the cuDNN download site:[`cuDNN download archive`](https://developer.nvidia.com/rdp/cudnn-archive).
-    - Click `Download cuDNN v8.5.0 (August 8th, 2022), for CUDA 11.x`.
-    - Download `Local Installer for Windows (Zip)`.
-    - Unzip `cudnn-windows-x86_64-8.5.0.96_cuda11-archive.zip`.
-    - Copy all three folders (`bin`,`include`,`lib`) and paste them to the `CUDA` installation directory `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7`. (NOTE `bin`,`include`,`lib` folders are already exist in the CUDA folder.).
+     - Click `Download cuDNN v8.9.0 (April 11th, 2023), for CUDA 12.x`.
+    - Unzip it
+    - Copy all three folders (`bin`,`include`,`lib`) and paste them to the `CUDA` installation directory `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1`. (NOTE `bin`,`include`,`lib` folders are already exist in the CUDA folder.).
 
 - Install `PyTorch`.
+For reliability, you need to download the CUDA versions of pytorch, torchvision and torchaudio from https://download.pytorch.org/whl/cu121
+Look for the versions with cu121 and cp10 win64 and pip install them
     ```shell
-    conda install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia
+    conda install pytorch-cuda=12.1.1 -c pytorch -c nvidia
     ```
 - Install `TensorRT`.
     Follow the [Nvidia instruction of installation](https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html#installing-zip).
     - Go to the [TensorRT download site](https://developer.nvidia.com/nvidia-tensorrt-8x-download).
-    - Download `TensorRT 8.5 GA for Windows 10 and CUDA 11.0, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7 and 11.8 ZIP Package`.
-    - Unzip the folder `TensorRT-8.5.2.2` from `TensorRT-8.5.2.2.Windows10.x86_64.cuda-11.8.cudnn8.6.zip`.
-    - Add the `<your install path>\TensorRT-8.5.2.2\lib` into PATH environment variable.
-    - Go to the folder `<your install path>\TensorRT-8.5.2.2\python`
+    - Download `TensorRT 8.6 GA for Windows 10 and CUDA 12.0 and 12.1 ZIP Package`.
+    - Unzip the folder
+    - Add the `<your install path>\TensorRT-8.6.1.6\lib` into PATH environment variable.
+    - Go to the folder `<your install path>\TensorRT-8.6.1.6\python`
     - In command window, input 
         ```shell
         conda activate yolov8 # activate dedicated environment
-        pip install tensorrt-8.5.2.2-cp310-none-win_amd64.whl # install tensorrt package to python
+        pip install tensorrt-8.6.1.6-cp310-none-win_amd64.whl # install tensorrt package to python
         ```
  - Install python requirement.
    ``` shell
-   pip install -r requirement.txt
+   pip install -r requirements.txt
    ```
 
 <details>
